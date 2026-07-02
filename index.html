@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cox Interiors — Stair Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5EFE4; --surface:#FFFDF8; --border:#DFD3BC; --border-strong:#C9B896;
+    --ink:#26190E; --ink-soft:#5C4A35; --ink-faint:#8C7A62;
+    --brass:#8F621F; --brass-deep:#6E4A14; --brass-tint:#F3E6CB; --radius:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Karla',sans-serif;background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer}
+
+  header{background:var(--ink);color:#F3EBDD;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--brass)}
+  .wordmark{display:flex;align-items:baseline;gap:14px}
+  .wordmark h1{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:.02em}
+  .wordmark h1 span{color:#D9A94F}
+  .wordmark .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#B9A783}
+  .hdr-right{display:flex;align-items:center;gap:14px}
+  .hdr-link{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#B9A783;text-decoration:none;border-bottom:1px dotted #574327;padding-bottom:1px}
+  .hdr-link:hover{color:#D9A94F}
+  .demo-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #574327;color:#D9A94F;padding:5px 12px;border-radius:999px}
+
+  .app{display:grid;grid-template-columns:330px minmax(0,1fr) 360px;min-height:calc(100vh - 64px - 46px)}
+  @media(max-width:1180px){
+    .app{grid-template-columns:300px minmax(0,1fr)}
+    .rail-right{grid-column:1 / -1;border-top:1px solid var(--border);border-left:none}
+  }
+  @media(max-width:760px){
+    .app{grid-template-columns:1fr}
+    .rail-left{border-right:none;border-bottom:1px solid var(--border)}
+    .stage{min-height:480px}
+  }
+
+  .rail-left{background:var(--surface);border-right:1px solid var(--border);padding:22px 22px 40px;overflow-y:auto}
+  .step{margin-bottom:24px}
+  .step-label{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .step-num{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--brass);letter-spacing:.1em;font-weight:600}
+  .step-label h3{font-family:'Fraunces',serif;font-weight:600;font-size:16px}
+
+  .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .chip-grid.three{grid-template-columns:1fr 1fr 1fr}
+  .chip{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);padding:9px 10px;text-align:left;font-size:13px;font-weight:500;color:var(--ink-soft);transition:border-color .15s ease-out, background .15s ease-out}
+  .chip:hover{border-color:var(--border-strong)}
+  .chip.active{border-color:var(--brass);background:var(--brass-tint);color:var(--ink);box-shadow:inset 0 0 0 1px var(--brass)}
+  .chip:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .chip .code{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-faint);margin-top:2px;letter-spacing:.06em}
+  .chip.active .code{color:var(--brass-deep)}
+
+  .swatch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .swatch{border:1px solid var(--border);border-radius:var(--radius);padding:5px;background:var(--surface);display:flex;flex-direction:column;gap:5px;transition:border-color .15s ease-out}
+  .swatch:hover{border-color:var(--border-strong)}
+  .swatch.active{border-color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+  .swatch:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .swatch .wood{height:30px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
+  .swatch .name{font-size:10.5px;font-weight:600;color:var(--ink-soft);text-align:center;line-height:1.2}
+  .swatch.active .name{color:var(--ink)}
+
+  select{width:100%;appearance:none;border:1px solid var(--border);border-radius:var(--radius);
+    background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235C4A35' fill='none' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+    padding:9px 28px 9px 10px;font-size:13px;font-weight:500;color:var(--ink);font-family:'Karla',sans-serif}
+  select:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+  .field label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}
+
+  .stage{position:relative;display:flex;align-items:center;justify-content:center;padding:36px 24px;
+    background:radial-gradient(ellipse 75% 60% at 50% 42%, #FCF7EC 0%, var(--paper) 70%);overflow:hidden}
+  .stage::before{content:"";position:absolute;inset:auto 0 0 0;height:34%;background:linear-gradient(180deg,transparent,rgba(94,72,44,.08));pointer-events:none}
+  .stage canvas{max-width:100%;height:auto;display:block}
+  .stage-tag{position:absolute;top:18px;left:24px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+  .stage-tag b{color:var(--ink);font-weight:600}
+
+  .rail-right{background:var(--surface);border-left:1px solid var(--border);padding:22px;overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+  .ticket{border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+  .ticket-head{background:var(--ink);color:#EFE6D4;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+  .ticket-head .t{font-family:'Fraunces',serif;font-size:15px;font-weight:600}
+  .ticket-head .sku{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#D9A94F;letter-spacing:.08em}
+  .bom{width:100%;border-collapse:collapse;font-size:12px}
+  .bom th{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);text-align:left;padding:10px 8px 6px;border-bottom:1px solid var(--border)}
+  .bom th:last-child,.bom td:last-child{text-align:right}
+  .bom td{padding:7px 8px;border-bottom:1px dashed var(--border);vertical-align:top}
+  .bom tr:last-child td{border-bottom:none}
+  .bom .part{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.03em}
+  .bom .desc{color:var(--ink-faint);font-size:11px}
+  .bom .qty{font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+  .bom .amt{font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap}
+  .price-line{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;border-top:1px solid var(--border);background:var(--brass-tint)}
+  .price-line .k{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass-deep)}
+  .price-line .v{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600}
+  .lead{font-size:12px;color:var(--ink-faint);padding:0 16px 12px;background:var(--brass-tint)}
+
+  .btn-primary{width:100%;border:none;border-radius:var(--radius);background:var(--brass);color:#FFF9EE;font-size:14px;font-weight:700;letter-spacing:.02em;padding:12px;transition:background .15s ease-out}
+  .btn-primary:hover{background:var(--brass-deep)}
+  .btn-primary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  .quote h4{font-family:'Fraunces',serif;font-size:16px;font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+  .quote h4 .count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);font-weight:400}
+  .quote-empty{border:1px dashed var(--border-strong);border-radius:var(--radius);padding:18px 14px;font-size:12.5px;color:var(--ink-faint);text-align:center}
+  .quote-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;margin-bottom:7px;background:var(--surface)}
+  .quote-item .qi-sku{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.04em}
+  .quote-item .qi-desc{font-size:11.5px;color:var(--ink-faint)}
+  .quote-item .qi-price{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;white-space:nowrap}
+  .qi-remove{border:none;background:none;color:var(--ink-faint);font-size:16px;line-height:1;padding:2px 4px;border-radius:3px}
+  .qi-remove:hover{color:#9A3B2B}
+  .quote-total{display:none;justify-content:space-between;align-items:baseline;border-top:2px solid var(--ink);padding-top:10px;margin-top:10px}
+  .quote-total .k{font-weight:700;font-size:13px}
+  .quote-total .v{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600}
+
+  footer{height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-top:1px solid var(--border);background:var(--surface);font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:.06em}
+  footer .ff{color:var(--ink-soft)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">
+    <h1>COX <span>INTERIORS</span></h1>
+    <div class="sub">Stair Studio</div>
+  </div>
+  <div class="hdr-right">
+    <a class="hdr-link" href="cox-door-studio.html">Door Studio</a>
+    <div class="demo-badge">Concept Demo · v0.1</div>
+  </div>
+</header>
+
+<div class="app">
+
+  <aside class="rail-left" aria-label="Stair configurator">
+    <div class="step">
+      <div class="step-label"><span class="step-num">01</span><h3>Flight</h3></div>
+      <div class="field"><label for="riserSel">Risers (7-1/2" rise · 10-1/2" run)</label>
+        <select id="riserSel"></select>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">02</span><h3>Tread species</h3></div>
+      <div class="swatch-grid" id="speciesGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">03</span><h3>Risers</h3></div>
+      <div class="chip-grid" id="riserStyleGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">04</span><h3>Balusters</h3></div>
+      <div class="chip-grid" id="balGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">05</span><h3>Newel posts</h3></div>
+      <div class="chip-grid" id="newelGrid"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span class="step-num">06</span><h3>Handrail profile</h3></div>
+      <div class="chip-grid three" id="railGrid"></div>
+    </div>
+  </aside>
+
+  <main class="stage" aria-label="Live stair preview">
+    <div class="stage-tag">Live preview — <b id="stageDesc"></b></div>
+    <canvas id="stairCanvas" aria-label="Rendered staircase preview"></canvas>
+  </main>
+
+  <aside class="rail-right" aria-label="Bill of materials and quote">
+    <div class="ticket">
+      <div class="ticket-head"><span class="t">Bill of materials</span><span class="sku" id="skuOut">—</span></div>
+      <table class="bom">
+        <thead><tr><th>Part</th><th>Qty</th><th>Ext.</th></tr></thead>
+        <tbody id="bomBody"></tbody>
+      </table>
+      <div class="price-line"><span class="k">System price</span><span class="v" id="priceOut">$0</span></div>
+      <div class="lead" id="leadOut">Est. lead time: 12–15 business days</div>
+    </div>
+    <button class="btn-primary" id="addBtn">Add system to quote</button>
+    <div class="quote">
+      <h4>Quote draft <span class="count" id="quoteCount">0 items</span></h4>
+      <div id="quoteList"><div class="quote-empty">Configure a stair system and add it here.</div></div>
+      <div class="quote-total" id="quoteTotalRow">
+        <span class="k">Quote total</span><span class="v" id="quoteTotal">$0</span>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <span>CATALOG: 5,500 ITEMS · PRICING ILLUSTRATIVE</span>
+  <span class="ff">BUILT BY FARM FLOW DATA SOLUTIONS</span>
+</footer>
+
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const SPECIES = [
+  {id:'ro', code:'RO', name:'Red Oak',   base:'#BE8756', mult:1.00, grainA:1.15, ringA:.8, streak:1.0, knots:0},
+  {id:'wo', code:'WO', name:'White Oak', base:'#CBAE7F', mult:1.18, grainA:0.95, ringA:.7, streak:0.9, knots:0},
+  {id:'mp', code:'MP', name:'Maple',     base:'#E2CA9E', mult:1.10, grainA:0.45, ringA:.4, streak:0.5, knots:0},
+  {id:'ch', code:'CH', name:'Cherry',    base:'#93502E', mult:1.35, grainA:0.75, ringA:.6, streak:0.8, knots:0},
+  {id:'wa', code:'WA', name:'Walnut',    base:'#55402F', mult:1.60, grainA:1.05, ringA:.9, streak:1.1, knots:0},
+  {id:'hi', code:'HI', name:'Hickory',   base:'#C09760', mult:1.15, grainA:1.0,  ringA:.8, streak:1.3, knots:1},
+];
+const RISER_STYLES = [
+  {id:'paint', name:'Painted White', code:'8075-PR', unit:24},
+  {id:'match', name:'Match Species', code:'8075',    unit:34},
+];
+const BALUSTERS = [
+  {id:'sq',    name:'Square',      code:'5060', kind:'wood', unit:14},
+  {id:'taper', name:'Craftsman Taper', code:'5015', kind:'wood', unit:18},
+  {id:'turn',  name:'Pin-Top Turned', code:'5141', kind:'wood', unit:26},
+  {id:'ibar',  name:'Iron Bar',    code:'IR-100', kind:'iron', unit:18},
+  {id:'itwist',name:'Iron Twist',  code:'IR-210', kind:'iron', unit:24},
+  {id:'iknuck',name:'Iron Basket', code:'IR-330', kind:'iron', unit:28},
+];
+const NEWELS = [
+  {id:'box',  name:'Box Newel',    code:'4091', unit:235},
+  {id:'turn', name:'Turned Newel', code:'4040', unit:195},
+];
+const RAILS = [
+  {id:'6010', name:'6010', desc:'Classic oval', lf:16},
+  {id:'6210', name:'6210', desc:'Fluted side', lf:19},
+  {id:'6900', name:'6900', desc:'Estate wide', lf:24},
+];
+const RISER_COUNTS=[9,10,11,12,13,14];
+
+const state={risers:12, species:'ro', riserStyle:'paint', bal:'turn', newel:'box', rail:'6010'};
+const quote=[];
+
+/* geometry constants (inches) */
+const RISE=7.5, RUN=10.5, NOSE=1.25, TREAD_T=1.0;
+const RAIL_H=2.6, RAIL_ABOVE=34;   /* underside of rail above tread nosing */
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const $=id=>document.getElementById(id);
+function hexRgb(hex){const n=parseInt(hex.slice(1),16);return[n>>16,(n>>8)&255,n&255]}
+function rgbHex(r,g,b){return'#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0')}
+function shade(hex,amt){let[r,g,b]=hexRgb(hex);const t=amt<0?0:255,a=Math.abs(amt);
+  r=Math.round(r+(t-r)*a);g=Math.round(g+(t-g)*a);b=Math.round(b+(t-b)*a);return rgbHex(r,g,b)}
+function rgba(hex,a){const[r,g,b]=hexRgb(hex);return`rgba(${r},${g},${b},${a})`}
+function seedFrom(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const money=n=>'$'+n.toLocaleString('en-US');
+function ftin(i){const f=Math.floor(i/12),r=Math.round(i%12);return r?`${f}'-${r}"`:`${f}'-0"`}
+
+const curSp=()=>SPECIES.find(s=>s.id===state.species);
+const curBal=()=>BALUSTERS.find(b=>b.id===state.bal);
+const curNewel=()=>NEWELS.find(n=>n.id===state.newel);
+const curRail=()=>RAILS.find(r=>r.id===state.rail);
+const curRiser=()=>RISER_STYLES.find(r=>r.id===state.riserStyle);
+
+/* ============================================================
+   WOOD PAINTER (same engine as Door Studio)
+============================================================ */
+function paintWood(ctx,x,y,w,h,sp,dir,seedStr,tone=0){
+  const base=shade(sp.base,tone);
+  const grainC=shade(sp.base,-0.5+tone*0.5);
+  const lightC=shade(sp.base,0.45);
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  const g=dir==='v'?ctx.createLinearGradient(x,y,x+w,y):ctx.createLinearGradient(x,y,x,y+h);
+  g.addColorStop(0,shade(base,.045));g.addColorStop(.5,base);g.addColorStop(1,shade(base,-.05));
+  ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+  const R=mulberry(seedFrom(seedStr));
+  const across=dir==='v'?w:h, along=dir==='v'?h:w;
+  const bands=2+Math.floor(R()*3);
+  for(let i=0;i<bands;i++){
+    const p=R()*across,bw=8+R()*26,dark=R()>0.4,a=(0.035+R()*0.05)*sp.streak;
+    ctx.fillStyle=dark?rgba(grainC,a):rgba(lightC,a*.8);
+    dir==='v'?ctx.fillRect(x+p,y,bw,h):ctx.fillRect(x,y+p,w,bw);
+  }
+  let p=1+R()*3;
+  while(p<across){
+    const amp=0.8+R()*2.2,f=0.006+R()*0.014,ph=R()*6.28;
+    const amp2=R()*0.9,f2=0.04+R()*0.05,ph2=R()*6;
+    const a=(0.045+R()*0.11)*sp.grainA,lw=0.5+R()*1.1,isL=R()<0.16;
+    ctx.strokeStyle=isL?rgba(lightC,a*.9):rgba(grainC,a);
+    ctx.lineWidth=lw;ctx.beginPath();
+    for(let t=0;t<=along;t+=7){
+      const off=amp*Math.sin(t*f+ph)+amp2*Math.sin(t*f2+ph2);
+      const xx=dir==='v'?x+p+off:x+t, yy=dir==='v'?y+t:y+p+off;
+      t===0?ctx.moveTo(xx,yy):ctx.lineTo(xx,yy);
+    }
+    ctx.stroke();
+    p+=R()<0.22*sp.ringA?1.2:2.2+R()*4.2;
+  }
+  if(sp.knots){
+    const nk=Math.floor(R()*sp.knots);
+    for(let i=0;i<nk;i++){
+      const kx=x+8+R()*Math.max(w-16,1),ky=y+8+R()*Math.max(h-16,1),kr=2+R()*3;
+      const kg=ctx.createRadialGradient(kx,ky,0,kx,ky,kr*2.4);
+      kg.addColorStop(0,rgba(shade(sp.base,-.6),.8));kg.addColorStop(1,rgba(shade(sp.base,-.3),0));
+      ctx.fillStyle=kg;ctx.beginPath();ctx.ellipse(kx,ky,kr*2.4,kr*1.6,R(),0,7);ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+/* cylinder shading overlay for turned parts */
+function lathe(ctx,x,w,y,h){
+  const g=ctx.createLinearGradient(x,0,x+w,0);
+  g.addColorStop(0,'rgba(20,10,0,.34)');
+  g.addColorStop(.28,'rgba(255,250,235,.10)');
+  g.addColorStop(.42,'rgba(255,250,235,.30)');
+  g.addColorStop(.62,'rgba(255,250,235,.06)');
+  g.addColorStop(1,'rgba(20,10,0,.40)');
+  ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+function renderStair(){
+  const sp=curSp(), N=state.risers, T=N-1; /* treads */
+  const rise=N*RISE, run=T*RUN;
+  const landW=26, offX=26;
+  const WIn=offX+run+NOSE+landW+16;
+  const HIn=rise+RAIL_ABOVE+RAIL_H+16;
+
+  const canvas=$('stairCanvas');
+  const stage=canvas.parentElement;
+  const availW=Math.max(stage.clientWidth-60,420);
+  const availH=Math.min(600,window.innerHeight-230);
+  const padL=78,padR=24,padT=22,padB=64;
+  const S=Math.min((availW-padL-padR)/WIn,(availH-padT-padB)/HIn);
+  const cw=WIn*S+padL+padR, chh=HIn*S+padT+padB;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=cw*dpr;canvas.height=chh*dpr;
+  canvas.style.width=cw+'px';canvas.style.height=chh+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cw,chh);
+
+  /* coordinate mapping: inches (x from left origin at first riser, y up from floor) */
+  const xx=v=>padL+(offX+v)*S;
+  const yy=v=>padT+(HIn-v)*S;
+  const Sc=v=>v*S;
+  const seed=`stair-${sp.id}-${N}`;
+
+  const stepTop=k=>(k+1)*RISE;             /* top of tread k (0-based) */
+  const noseX=k=>k*RUN;                     /* nosing front x of tread k */
+  const slope=RISE/RUN;
+  const railU=x=>RISE+RAIL_ABOVE+x*slope;   /* rail underside at x */
+
+  const balW=curBal().kind==='iron'?0.75:1.35;
+  const newelW=curNewel().id==='box'?5.5:4.0;
+  const botNX=-4-newelW/2, topNX=run+NOSE+6;
+  const botNH=railU(botNX)+RAIL_H+8;
+  const topNH=rise+38;
+
+  /* ---- floor + landing shadows ---- */
+  ctx.fillStyle='rgba(60,40,18,.15)';
+  ctx.beginPath();
+  ctx.ellipse(xx(run/2), yy(0)+10, Sc(run/1.6), 10, 0, 0, 7);
+  ctx.fill();
+
+  /* ---- floor planks (lower) ---- */
+  const floorY=yy(0);
+  const fg=ctx.createLinearGradient(0,floorY,0,floorY+16);
+  fg.addColorStop(0,'#D9C5A2');fg.addColorStop(1,'#C4AC85');
+  ctx.fillStyle=fg;
+  ctx.fillRect(padL-40,floorY,Sc(offX+run*0.34)+40,14);
+  ctx.strokeStyle='rgba(90,60,30,.25)';ctx.lineWidth=1;
+  for(let px=padL-30;px<padL+Sc(offX+run*0.3);px+=34){ctx.beginPath();ctx.moveTo(px,floorY);ctx.lineTo(px,floorY+14);ctx.stroke()}
+  ctx.strokeStyle='rgba(60,35,10,.35)';
+  ctx.beginPath();ctx.moveTo(padL-40,floorY+.5);ctx.lineTo(padL+Sc(offX+run*0.34)+0,floorY+.5);ctx.stroke();
+
+  /* ---- landing (upper floor) ---- */
+  const landX=xx(run+NOSE), landY=yy(rise);
+  ctx.fillStyle='#EDE4D2';
+  ctx.fillRect(landX,landY+Sc(1.2),Sc(landW+10),yy(0)-landY-Sc(1.2)+14);
+  let lsh=ctx.createLinearGradient(landX,0,landX+22,0);
+  lsh.addColorStop(0,'rgba(40,22,5,.16)');lsh.addColorStop(1,'rgba(40,22,5,0)');
+  ctx.fillStyle=lsh;ctx.fillRect(landX,landY+Sc(1.2),22,yy(0)-landY+14);
+  paintWood(ctx,landX-Sc(NOSE),landY,Sc(landW+10+NOSE),Sc(1.2),sp,'h',seed+'-land');
+  ctx.strokeStyle='rgba(15,8,0,.4)';ctx.lineWidth=1.2;
+  ctx.strokeRect(landX-Sc(NOSE)+.5,landY+.5,Sc(landW+10+NOSE)-1,Sc(1.2)-1);
+
+  /* ---- closed stringer / skirt ---- */
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(xx(-2),yy(0));
+  ctx.lineTo(xx(-2),yy(RISE*0.9));
+  ctx.lineTo(xx(run-2),yy(rise*0.97));
+  ctx.lineTo(xx(run+NOSE),yy(rise*0.97));
+  ctx.lineTo(xx(run+NOSE),yy(0));
+  ctx.closePath();ctx.clip();
+  paintWood(ctx,xx(-2),yy(rise),Sc(run+NOSE+2),yy(0)-yy(rise),sp,'h',seed+'-skirt',-0.12);
+  ctx.restore();
+
+  /* ---- risers & treads ---- */
+  const riserPaint=state.riserStyle==='paint';
+  for(let k=0;k<N;k++){
+    const rx=xx(noseX(k)-0), rTop=yy(stepTop(k)), rBot=yy(k*RISE);
+    const rw=Sc(RUN>0?0:0);
+    /* riser face: from tread_k-1 back edge to under tread k */
+    const faceX=xx(noseX(k)), faceW=Sc(0.9);
+    const fx=xx(noseX(k)), fy=yy(stepTop(k))+Sc(TREAD_T), fh=yy(k*RISE)-fy;
+    if(fh>1){
+      if(riserPaint){
+        const pg=ctx.createLinearGradient(0,fy,0,fy+fh);
+        pg.addColorStop(0,'#F4F0E7');pg.addColorStop(1,'#E3DCCB');
+        ctx.fillStyle=pg;ctx.fillRect(fx,fy,Sc(RUN+0.4),fh);
+        ctx.strokeStyle='rgba(15,8,0,.18)';ctx.lineWidth=1;
+        ctx.strokeRect(fx+.5,fy+.5,Sc(RUN+0.4)-1,fh-1);
+      } else {
+        paintWood(ctx,fx,fy,Sc(RUN+0.4),fh,sp,'h',seed+'-r'+k,0.02);
+        ctx.strokeStyle='rgba(15,8,0,.25)';ctx.lineWidth=1;
+        ctx.strokeRect(fx+.5,fy+.5,Sc(RUN+0.4)-1,fh-1);
+      }
+      /* shadow cast by nosing above */
+      const ng=ctx.createLinearGradient(0,fy,0,fy+Sc(2.2));
+      ng.addColorStop(0,'rgba(15,8,0,.28)');ng.addColorStop(1,'rgba(15,8,0,0)');
+      ctx.fillStyle=ng;ctx.fillRect(fx,fy,Sc(RUN+0.4),Sc(2.2));
+    }
+    /* tread k (skip virtual tread at top: k<T) */
+    if(k<T){
+      const tx=xx(noseX(k)-NOSE), tw=Sc(RUN+NOSE+0.4), ty=yy(stepTop(k)), th=Sc(TREAD_T);
+      paintWood(ctx,tx,ty,tw,th,sp,'h',seed+'-t'+k,0.05);
+      /* bullnose */
+      ctx.fillStyle=shade(sp.base,-.12);
+      ctx.beginPath();ctx.arc(tx+1,ty+th/2,th/2,Math.PI*0.5,Math.PI*1.5);ctx.fill();
+      ctx.strokeStyle='rgba(15,8,0,.42)';ctx.lineWidth=1.2;
+      ctx.beginPath();
+      ctx.moveTo(tx+tw,ty+.6);ctx.lineTo(tx+2,ty+.6);
+      ctx.arc(tx+1,ty+th/2,th/2-0.4,Math.PI*1.5,Math.PI*0.5,true);
+      ctx.lineTo(tx+tw,ty+th-.6);
+      ctx.stroke();
+      ctx.strokeStyle='rgba(255,250,235,.5)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(tx+3,ty+1.6);ctx.lineTo(tx+tw,ty+1.6);ctx.stroke();
+    }
+  }
+
+  /* ---- balusters (2 per tread) ---- */
+  const bal=curBal();
+  for(let k=0;k<T;k++){
+    [2.6,7.4].forEach((o,j)=>{
+      const bx=noseX(k)+o;
+      drawBaluster(ctx,xx(bx),yy(stepTop(k)),yy(railU(bx)),Sc(balW),bal,sp,seed+`-b${k}${j}`,Sc);
+    });
+  }
+
+  /* ---- handrail along slope ---- */
+  const rx0=botNX+newelW/2-0.5, rx1=topNX-newelW/2+0.5;
+  const p0={x:xx(rx0),y:yy(railU(rx0)+RAIL_H/2)};
+  const p1={x:xx(rx1),y:yy(railU(rx1)+RAIL_H/2)};
+  const ang=Math.atan2(p1.y-p0.y,p1.x-p0.x);
+  const len=Math.hypot(p1.x-p0.x,p1.y-p0.y);
+  ctx.save();
+  ctx.translate(p0.x,p0.y);ctx.rotate(ang);
+  const rh=Sc(RAIL_H);
+  paintWood(ctx,0,-rh/2,len,rh,sp,'h',seed+'-rail',0.03);
+  /* profile shading */
+  let rg=ctx.createLinearGradient(0,-rh/2,0,rh/2);
+  rg.addColorStop(0,'rgba(255,250,235,.38)');rg.addColorStop(.35,'rgba(255,250,235,.06)');
+  rg.addColorStop(.75,'rgba(20,10,0,.10)');rg.addColorStop(1,'rgba(20,10,0,.38)');
+  ctx.fillStyle=rg;ctx.fillRect(0,-rh/2,len,rh);
+  ctx.strokeStyle='rgba(15,8,0,.45)';ctx.lineWidth=1.2;
+  ctx.strokeRect(.6,-rh/2+.6,len-1.2,rh-1.2);
+  if(state.rail==='6210'){
+    ctx.strokeStyle='rgba(20,10,0,.28)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,rh*.12);ctx.lineTo(len,rh*.12);ctx.stroke();
+    ctx.strokeStyle='rgba(255,250,235,.3)';
+    ctx.beginPath();ctx.moveTo(0,rh*.22);ctx.lineTo(len,rh*.22);ctx.stroke();
+  }
+  if(state.rail==='6900'){
+    ctx.strokeStyle='rgba(20,10,0,.25)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,-rh*.18);ctx.lineTo(len,-rh*.18);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,rh*.16);ctx.lineTo(len,rh*.16);ctx.stroke();
+    ctx.strokeStyle='rgba(255,250,235,.32)';
+    ctx.beginPath();ctx.moveTo(0,-rh*.08);ctx.lineTo(len,-rh*.08);ctx.stroke();
+  }
+  ctx.restore();
+
+  /* ---- newels ---- */
+  drawNewel(ctx,xx(botNX),yy(0),Sc(newelW),Sc(botNH),sp,seed+'-nw0',Sc);
+  drawNewel(ctx,xx(topNX),yy(rise),Sc(newelW),Sc(topNH),sp,seed+'-nw1',Sc);
+
+  /* ---- dimensions ---- */
+  const dimC='#8C7A62';
+  ctx.strokeStyle=dimC;ctx.fillStyle=dimC;ctx.lineWidth=1;
+  ctx.font="12px 'IBM Plex Mono', monospace";
+  const dx=padL-26;
+  ctx.beginPath();
+  ctx.moveTo(dx,yy(0));ctx.lineTo(dx,yy(rise));
+  ctx.moveTo(dx-6,yy(0));ctx.lineTo(dx+6,yy(0));
+  ctx.moveTo(dx-6,yy(rise));ctx.lineTo(dx+6,yy(rise));
+  ctx.stroke();
+  ctx.save();ctx.translate(dx-10,(yy(0)+yy(rise))/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center';ctx.fillText(`RISE ${ftin(rise)}`,0,0);ctx.restore();
+  const dy2=yy(0)+34;
+  ctx.beginPath();
+  ctx.moveTo(xx(0),dy2);ctx.lineTo(xx(run),dy2);
+  ctx.moveTo(xx(0),dy2-6);ctx.lineTo(xx(0),dy2+6);
+  ctx.moveTo(xx(run),dy2-6);ctx.lineTo(xx(run),dy2+6);
+  ctx.stroke();
+  ctx.textAlign='center';
+  ctx.fillText(`RUN ${ftin(run)} · ${N} RISERS`,xx(run/2),dy2+18);
+}
+
+/* baluster renderer */
+function drawBaluster(ctx,cx,yBot,yTop,w,bal,sp,seed,Sc){
+  const h=yBot-yTop;
+  if(h<6) return;
+  if(bal.kind==='iron'){
+    const iw=Math.max(w,3);
+    let g=ctx.createLinearGradient(cx-iw/2,0,cx+iw/2,0);
+    g.addColorStop(0,'#1E1B18');g.addColorStop(.35,'#4A443E');g.addColorStop(.5,'#5C554E');g.addColorStop(.65,'#3A3530');g.addColorStop(1,'#15120F');
+    ctx.fillStyle=g;
+    ctx.fillRect(cx-iw/2,yTop,iw,h);
+    /* shoe */
+    ctx.fillStyle='#26221E';
+    ctx.fillRect(cx-iw*1.3,yBot-Sc(1.1),iw*2.6,Sc(1.1));
+    if(bal.id==='itwist'){
+      const t0=yTop+h*.30,t1=yTop+h*.62;
+      ctx.strokeStyle='rgba(200,190,175,.5)';ctx.lineWidth=1.1;
+      for(let y=t0;y<t1;y+=6){
+        ctx.beginPath();ctx.moveTo(cx-iw*.8,y+5);ctx.lineTo(cx+iw*.8,y);ctx.stroke();
+      }
+      ctx.strokeStyle='rgba(0,0,0,.55)';
+      ctx.strokeRect(cx-iw*.85,t0,iw*1.7,t1-t0);
+    }
+    if(bal.id==='iknuck'){
+      const my=yTop+h*.46, r=Sc(1.7);
+      let bg=ctx.createRadialGradient(cx-r*.3,my-r*.3,0,cx,my,r);
+      bg.addColorStop(0,'#6A625A');bg.addColorStop(1,'#17140F');
+      ctx.fillStyle=bg;
+      ctx.beginPath();ctx.moveTo(cx,my-r*1.5);
+      ctx.quadraticCurveTo(cx+r,my,cx,my+r*1.5);
+      ctx.quadraticCurveTo(cx-r,my,cx,my-r*1.5);
+      ctx.fill();
+    }
+    return;
+  }
+  /* wood balusters */
+  if(bal.id==='sq'){
+    paintWood(ctx,cx-w/2,yTop,w,h,sp,'v',seed,0.02);
+    lathe(ctx,cx-w/2,w,yTop,h);
+    ctx.strokeStyle='rgba(15,8,0,.35)';ctx.lineWidth=1;
+    ctx.strokeRect(cx-w/2+.5,yTop+.5,w-1,h-1);
+    return;
+  }
+  if(bal.id==='taper'){
+    const wTop=w*.62;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx-wTop/2,yTop);ctx.lineTo(cx+wTop/2,yTop);
+    ctx.lineTo(cx+w/2,yBot);ctx.lineTo(cx-w/2,yBot);ctx.closePath();
+    ctx.clip();
+    paintWood(ctx,cx-w/2,yTop,w,h,sp,'v',seed,0.02);
+    lathe(ctx,cx-w/2,w,yTop,h);
+    ctx.restore();
+    ctx.strokeStyle='rgba(15,8,0,.35)';ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(cx-wTop/2,yTop);ctx.lineTo(cx+wTop/2,yTop);
+    ctx.lineTo(cx+w/2,yBot);ctx.lineTo(cx-w/2,yBot);ctx.closePath();ctx.stroke();
+    return;
+  }
+  /* turned pin-top: piecewise profile, halfwidth as fraction of w */
+  const prof=t=>{ /* t: 0 top → 1 bottom */
+    if(t<0.055) return .5;                          /* top block */
+    if(t<0.36)  return .26+.04*Math.sin(t*40);      /* pin shaft */
+    if(t<0.44)  return .30+ (t-.36)*3.2;            /* transition */
+    if(t<0.62){ const u=(t-.53)/.09; return .56*Math.exp(-u*u)+.30 } /* vase */
+    if(t<0.66)  return .34;
+    if(t<0.70)  return .46;                          /* ring */
+    if(t<0.88)  return .38;
+    return .5;                                       /* base block */
+  };
+  ctx.save();
+  ctx.beginPath();
+  const steps=40;
+  for(let i=0;i<=steps;i++){const t=i/steps;ctx.lineTo(cx-w*prof(t),yTop+h*t)}
+  for(let i=steps;i>=0;i--){const t=i/steps;ctx.lineTo(cx+w*prof(t),yTop+h*t)}
+  ctx.closePath();ctx.clip();
+  paintWood(ctx,cx-w,yTop,w*2,h,sp,'v',seed,0.02);
+  lathe(ctx,cx-w,w*2,yTop,h);
+  /* ring shadows at profile transitions */
+  [0.055,0.36,0.44,0.62,0.66,0.70,0.88].forEach(t=>{
+    ctx.fillStyle='rgba(15,8,0,.22)';
+    ctx.fillRect(cx-w,yTop+h*t-0.6,w*2,1.2);
+    ctx.fillStyle='rgba(255,250,235,.20)';
+    ctx.fillRect(cx-w,yTop+h*t+0.7,w*2,0.9);
+  });
+  ctx.restore();
+  ctx.strokeStyle='rgba(15,8,0,.30)';ctx.lineWidth=1;
+  ctx.beginPath();
+  for(let i=0;i<=steps;i++){const t=i/steps;ctx.lineTo(cx-w*prof(t),yTop+h*t)}
+  ctx.stroke();
+  ctx.beginPath();
+  for(let i=0;i<=steps;i++){const t=i/steps;ctx.lineTo(cx+w*prof(t),yTop+h*t)}
+  ctx.stroke();
+}
+
+/* newel renderer (cx = center, yBase = floor line, w,h in px) */
+function drawNewel(ctx,cx,yBase,w,h,sp,seed,Sc){
+  const yTop=yBase-h;
+  /* shadow */
+  ctx.fillStyle='rgba(50,32,12,.20)';
+  ctx.beginPath();ctx.ellipse(cx+3,yBase+3,w*.85,5,0,0,7);ctx.fill();
+
+  if(state.newel==='box'){
+    paintWood(ctx,cx-w/2,yTop,w,h,sp,'v',seed,0.01);
+    lathe(ctx,cx-w/2,w,yTop,h);
+    /* recessed panel */
+    const px=cx-w/2+w*.16,pw=w*.68;
+    const py=yTop+h*.20,ph=h*.52;
+    ctx.fillStyle='rgba(15,8,0,.16)';ctx.fillRect(px,py,pw,ph);
+    paintWood(ctx,px+2,py+2,pw-4,ph-4,sp,'v',seed+'-pnl',-0.06);
+    ctx.strokeStyle='rgba(15,8,0,.4)';ctx.lineWidth=1.2;ctx.strokeRect(px+.5,py+.5,pw-1,ph-1);
+    ctx.strokeStyle='rgba(255,250,235,.3)';ctx.lineWidth=1;ctx.strokeRect(px+2.2,py+2.2,pw-4.4,ph-4.4);
+    /* cap */
+    const capO=w*.20;
+    paintWood(ctx,cx-w/2-capO,yTop-Sc(1.4),w+capO*2,Sc(1.4),sp,'h',seed+'-cap1',0.05);
+    paintWood(ctx,cx-w/2-capO*.5,yTop-Sc(2.6),w+capO,Sc(1.2),sp,'h',seed+'-cap2',0.08);
+    ctx.strokeStyle='rgba(15,8,0,.45)';ctx.lineWidth=1.1;
+    ctx.strokeRect(cx-w/2-capO+.5,yTop-Sc(1.4)+.5,w+capO*2-1,Sc(1.4)-1);
+    ctx.strokeRect(cx-w/2-capO*.5+.5,yTop-Sc(2.6)+.5,w+capO-1,Sc(1.2)-1);
+    /* cap underside shadow */
+    let g=ctx.createLinearGradient(0,yTop,0,yTop+8);
+    g.addColorStop(0,'rgba(15,8,0,.3)');g.addColorStop(1,'rgba(15,8,0,0)');
+    ctx.fillStyle=g;ctx.fillRect(cx-w/2,yTop,w,8);
+    ctx.strokeStyle='rgba(15,8,0,.4)';ctx.lineWidth=1.2;
+    ctx.strokeRect(cx-w/2+.5,yTop+.5,w-1,h-1);
+  } else {
+    /* turned newel: base block, turned body, ball finial */
+    const baseH=h*.30, bodyH=h*.56, ballR=w*.44;
+    const byTop=yTop+ballR*1.9;
+    /* base block */
+    paintWood(ctx,cx-w/2,yBase-baseH,w,baseH,sp,'v',seed+'-b',0.01);
+    lathe(ctx,cx-w/2,w,yBase-baseH,baseH);
+    ctx.strokeStyle='rgba(15,8,0,.4)';ctx.lineWidth=1.1;
+    ctx.strokeRect(cx-w/2+.5,yBase-baseH+.5,w-1,baseH-1);
+    /* turned body */
+    const prof=t=>{
+      if(t<0.08) return .46;
+      if(t<0.16) return .34;
+      if(t<0.42){const u=(t-.30)/.13;return .50*Math.exp(-u*u)+.26}
+      if(t<0.50) return .30;
+      if(t<0.56) return .42;
+      if(t<0.92) return .32+.05*Math.sin(t*30);
+      return .48;
+    };
+    const bTop=byTop, bH=yBase-baseH-bTop;
+    ctx.save();ctx.beginPath();
+    const st=36;
+    for(let i=0;i<=st;i++){const t=i/st;ctx.lineTo(cx-w*prof(t),bTop+bH*t)}
+    for(let i=st;i>=0;i--){const t=i/st;ctx.lineTo(cx+w*prof(t),bTop+bH*t)}
+    ctx.closePath();ctx.clip();
+    paintWood(ctx,cx-w,bTop,w*2,bH,sp,'v',seed+'-t',0.02);
+    lathe(ctx,cx-w,w*2,bTop,bH);
+    [0.08,0.16,0.42,0.50,0.56,0.92].forEach(t=>{
+      ctx.fillStyle='rgba(15,8,0,.25)';ctx.fillRect(cx-w,bTop+bH*t-0.7,w*2,1.3);
+      ctx.fillStyle='rgba(255,250,235,.22)';ctx.fillRect(cx-w,bTop+bH*t+0.8,w*2,1);
+    });
+    ctx.restore();
+    /* ball finial */
+    const bcy=yTop+ballR;
+    let bg=ctx.createRadialGradient(cx-ballR*.35,bcy-ballR*.4,ballR*.1,cx,bcy,ballR);
+    bg.addColorStop(0,shade(sp.base,.35));bg.addColorStop(.6,sp.base);bg.addColorStop(1,shade(sp.base,-.42));
+    ctx.fillStyle=bg;
+    ctx.beginPath();ctx.arc(cx,bcy,ballR,0,7);ctx.fill();
+    ctx.strokeStyle='rgba(15,8,0,.35)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(cx,bcy,ballR,0,7);ctx.stroke();
+    /* collar */
+    paintWood(ctx,cx-w*.34,bcy+ballR*.8,w*.68,ballR*.6,sp,'h',seed+'-col',0.04);
+  }
+}
+
+/* ============================================================
+   BOM + PRICING
+============================================================ */
+function bom(){
+  const sp=curSp(), N=state.risers, T=N-1;
+  const bal=curBal(), nw=curNewel(), rl=curRail(), rs=curRiser();
+  const rise=N*RISE, run=T*RUN;
+  const lf=Math.ceil(Math.hypot(rise,run)/12)+2;
+  const items=[
+    {part:`8070-${sp.code}`, desc:`Tread, ${sp.name} bullnose`, qty:T, unit:Math.round(58*sp.mult)},
+    {part:rs.id==='paint'?rs.code:`${rs.code}-${sp.code}`, desc:`Riser, ${rs.name.toLowerCase()}`, qty:N, unit:rs.id==='paint'?rs.unit:Math.round(rs.unit*sp.mult)},
+    {part:bal.kind==='iron'?bal.code:`${bal.code}-${sp.code}`, desc:`Baluster, ${bal.name.toLowerCase()}`, qty:2*T, unit:bal.kind==='iron'?bal.unit:Math.round(bal.unit*sp.mult)},
+    {part:`${nw.code}-${sp.code}`, desc:`${nw.name}`, qty:2, unit:Math.round(nw.unit*sp.mult)},
+    {part:`${rl.id}-${sp.code}`, desc:`Handrail ${rl.id}, ${rl.desc.toLowerCase()}`, qty:lf, unit:Math.round(rl.lf*sp.mult), lf:true},
+  ];
+  items.forEach(i=>i.ext=i.qty*i.unit);
+  return items;
+}
+const sysSku=()=>`CI-STR-${state.risers}R-${curSp().code}`;
+
+/* ============================================================
+   UI
+============================================================ */
+function buildControls(){
+  $('riserSel').innerHTML=RISER_COUNTS.map(n=>{
+    const rise=n*RISE;
+    return `<option value="${n}">${n} risers — total rise ${ftin(rise)}</option>`;
+  }).join('');
+  $('riserSel').value=state.risers;
+  $('speciesGrid').innerHTML=SPECIES.map(s=>
+    `<button class="swatch" data-k="species" data-v="${s.id}" aria-label="${s.name}">
+      <span class="wood" style="background:linear-gradient(160deg, ${shade(s.base,.08)}, ${s.base} 55%, ${shade(s.base,-.12)})"></span>
+      <span class="name">${s.name}</span></button>`).join('');
+  $('riserStyleGrid').innerHTML=RISER_STYLES.map(r=>
+    `<button class="chip" data-k="riserStyle" data-v="${r.id}">${r.name}<span class="code">${r.code} · $${r.unit}${r.id==='match'?'×':''}</span></button>`).join('');
+  $('balGrid').innerHTML=BALUSTERS.map(b=>
+    `<button class="chip" data-k="bal" data-v="${b.id}">${b.name}<span class="code">${b.code} · $${b.unit}${b.kind==='wood'?'×':''}</span></button>`).join('');
+  $('newelGrid').innerHTML=NEWELS.map(n=>
+    `<button class="chip" data-k="newel" data-v="${n.id}">${n.name}<span class="code">${n.code} · $${n.unit}×</span></button>`).join('');
+  $('railGrid').innerHTML=RAILS.map(r=>
+    `<button class="chip" data-k="rail" data-v="${r.id}">${r.name}<span class="code">$${r.lf}/LF</span></button>`).join('');
+}
+function syncControls(){
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    el.classList.toggle('active',state[el.dataset.k]===el.dataset.v);
+  });
+}
+function renderBom(){
+  const items=bom();
+  $('bomBody').innerHTML=items.map(i=>
+    `<tr><td><div class="part">${i.part}</div><div class="desc">${i.desc}</div></td>
+     <td class="qty">×${i.qty}${i.lf?' LF':''}</td>
+     <td class="amt">${money(i.ext)}</td></tr>`).join('');
+  const total=items.reduce((a,b)=>a+b.ext,0);
+  $('priceOut').textContent=money(total);
+  $('skuOut').textContent=sysSku();
+  $('stageDesc').textContent=`${state.risers}-riser flight · ${curSp().name}`;
+  return total;
+}
+function renderQuote(){
+  $('quoteCount').textContent=`${quote.length} item${quote.length===1?'':'s'}`;
+  if(!quote.length){
+    $('quoteList').innerHTML='<div class="quote-empty">Configure a stair system and add it here.</div>';
+    $('quoteTotalRow').style.display='none';return;
+  }
+  $('quoteList').innerHTML=quote.map((q,i)=>
+    `<div class="quote-item"><div><div class="qi-sku">${q.sku}</div><div class="qi-desc">${q.desc}</div></div>
+     <span class="qi-price">${money(q.price)}</span>
+     <button class="qi-remove" data-i="${i}" aria-label="Remove ${q.sku}">×</button></div>`).join('');
+  $('quoteTotal').textContent=money(quote.reduce((a,b)=>a+b.price,0));
+  $('quoteTotalRow').style.display='flex';
+}
+function refresh(){syncControls();renderStair();renderBom()}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-k]');
+  if(t){state[t.dataset.k]=t.dataset.v;refresh();return}
+  const r=e.target.closest('.qi-remove');
+  if(r){quote.splice(+r.dataset.i,1);renderQuote()}
+});
+$('riserSel').addEventListener('change',e=>{state.risers=+e.target.value;refresh()});
+$('addBtn').addEventListener('click',()=>{
+  const total=bom().reduce((a,b)=>a+b.ext,0);
+  quote.push({sku:sysSku(),desc:`${state.risers}-riser system, ${curSp().name}, ${curBal().name} balusters`,price:total});
+  renderQuote();
+});
+window.addEventListener('resize',()=>renderStair());
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>renderStair());
+
+buildControls();refresh();renderQuote();
+</script>
+</body>
+</html>
